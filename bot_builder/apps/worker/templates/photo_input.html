@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://smartcaptcha.yandexcloud.net/captcha.js" defer></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: rgb(232, 232, 232);
+        }
+
+        body {
+            color: white;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+
+        .content {
+            padding: 20px;
+            padding-bottom: 100px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .header img {
+            border-radius: 10px;
+            width: 100%;
+
+            height: auto;
+        }
+
+        .fixed-button-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #444;
+            padding: 16px;
+            box-sizing: border-box;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .text {
+            color: #313131;
+            text-align: center;
+            font-size: 14px;
+            margin: 20px 0;
+            font-weight: 700;
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+        .messages .success {
+            color: green;
+        }
+        .messages .error {
+            color: red;
+        }
+
+        .upload-button {
+            background-color: #2a2a2a;
+            border: none;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .upload-icon {
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+        }
+
+        #file-upload {
+            display: none;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .file-info img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 10px;
+            display: none;
+        }
+        .file-info .file-name {
+            font-size: 14px;
+            color: #949494;
+            display: none;
+            word-break: break-all;
+        }
+
+        .terms {
+            text-align: center;
+            color: #313131;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .terms a {
+            color: #2D7FED;
+            text-decoration: none;
+        }
+
+        .smart-captcha {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .error-text {
+            color: #ff4444;
+            text-align: center;
+            font-size: 14px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .send-button {
+            width: 100%;
+            border: none;
+            background-color: #2D7FED;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        
+        .send-button:disabled {
+            background-color: #666;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        form {
+            height: 100%;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'user_photo_upload' %}">
+        {% csrf_token %}
+        
+        <div class="content">
+            <div class="header">
+                <img src="https://i.imgur.com/xTcVnM2.jpeg" alt="Digital Pulse Pro">
+            </div>
+
+            <div class="text">ПОЖАЛУЙСТА, ЗАГРУЗИТЕ ОДНУ ВАШУ ФОТОГРАФИЮ</div>
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <button type="button" class="upload-button" onclick="document.getElementById('file-upload').click();">
+                Загрузить
+                <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+            </button>
+
+            <input id="file-upload" type="file" name="photo" accept="image/*" required />
+
+            <div class="file-info" id="file-info">
+                <img id="file-thumbnail" src="#" alt="Thumbnail">
+                <span class="file-name" id="file-name"></span>
+            </div>
+
+            <input type="hidden" name="tg_id" value="{{ tg_id }}">
+
+            <div class="terms">
+                Отправляя данное сообщение, вы соглашаетесь с 
+                <a href="https://telegra.ph/Polzovatelskoe-soglashenie-12-12-12">пользовательским соглашением</a>
+            </div>
+
+            <div id="captcha-container" class="smart-captcha" 
+                 data-sitekey="ysc1_Zfnsr1be6Hlb2XCHk1Bf88eItrNXHpKuskEc89FG654c4e2b"
+                 data-callback="captchaCallback">
+            </div>
+        </div>
+
+
+
+    </form>
+
+    {% if close %}
+        <script>Telegram.WebApp.close();</script>
+    {% endif %}
+
+    <script>
+        // Инициализация Telegram WebApp
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+
+        Telegram.WebApp.ready();
+        Telegram.WebApp.setHeaderColor('bg_color', '#FFFFFF');
+
+        // 2. Проверяем текущую схему (light / dark / unknown)
+        const colorScheme = Telegram.WebApp.colorScheme;
+        // 3. Получаем дополнительные параметры темы
+        const themeParams = Telegram.WebApp.themeParams;
+
+        function applyTheme(scheme) {
+            if (scheme === 'dark') {
+                document.body.style.backgroundColor = '#222';
+                document.body.style.color = '#fff'; // чтобы общий текст стал белым
+                const textAndTermsElements = document.querySelectorAll('.text, .terms');
+                    textAndTermsElements.forEach(el => {
+                        el.style.color = '#fff';
+                    });
+                
+            } else {
+                document.body.style.backgroundColor = '#fff';
+                document.body.style.color = '#000'; // общий текст - черный
+
+                // Меняем цвет у .text на темный (или любой другой)
+                const textElements = document.querySelectorAll('.text');
+                textElements.forEach(el => {
+                    el.style.color = '#313131';
+                });
+            }
+        }
+
+        // Первая отрисовка в зависимости от начальной темы
+        applyTheme(colorScheme);
+        
+        // Настройка MainButton
+        const mainButton = Telegram.WebApp.MainButton;
+        mainButton.setText('Отправить ответ');
+        mainButton.show();
+        mainButton.disable();
+    
+        // Установка начального серого цвета для неактивной кнопки
+        mainButton.setParams({
+            text_color: '#FFFFFF',
+            color: '#7C7C7C', // Серый цвет для disabled состояния
+        });
+    
+        let isPhotoUploaded = false;
+        let isCaptchaVerified = false;
+        const form = document.querySelector('form');
+        const fileUpload = document.getElementById('file-upload');
+        const fileThumbnail = document.getElementById('file-thumbnail');
+        const fileName = document.getElementById('file-name');
+        const captchaContainer = document.getElementById('captcha-container');
+    
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 МБ
+    
+        // Проверка доступности отправки
+        function checkSubmitAvailability() {
+            if (isPhotoUploaded && isCaptchaVerified) {
+                mainButton.enable();
+                mainButton.setParams({
+                    color: '#2481cc', // Активный цвет кнопки
+                });
+            } else {
+                mainButton.disable();
+                mainButton.setParams({
+                    color: '#7C7C7C', // Серый цвет для неактивной кнопки
+                });
+            }
+        }
+    
+        // Обработчик выбора файла
+        fileUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+    
+            if (!file.type.startsWith('image/')) {
+                alert('Пожалуйста, выберите изображение (JPEG, PNG и т.д.)');
+                event.target.value = '';
+                return;
+            }
+    
+            if (file.size > MAX_FILE_SIZE) {
+                alert('Файл слишком большой! Максимальный размер: 5 МБ.');
+                event.target.value = '';
+                return;
+            }
+    
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const arr = new Uint8Array(e.target.result).subarray(0, 4);
+                let header = '';
+                for (let i = 0; i < arr.length; i++) {
+                    header += arr[i].toString(16);
+                }
+    
+                if (header.startsWith('89504e47') || header.startsWith('ffd8ff') || header.startsWith('47494638')) {
+                    handleValidFile(file);
+                } else {
+                    alert('Неподходящий формат: сигнатура файла не совпадает с известными форматами изображений.');
+                    event.target.value = '';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+    
+        // Обработка валидного файла
+        function handleValidFile(file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                fileThumbnail.src = e.target.result;
+                fileThumbnail.style.display = 'block';
+                fileName.textContent = file.name;
+                fileName.style.display = 'block';
+                isPhotoUploaded = true;
+                captchaContainer.style.display = 'block'; // Показ капчи
+                checkSubmitAvailability();
+            };
+            reader.readAsDataURL(file);
+        }
+    
+        // Callback для капчи
+        window.captchaCallback = function (token) {
+            console.log("Captcha callback triggered with token");
+            isCaptchaVerified = true;
+            checkSubmitAvailability();
+    
+            // Добавление токена в скрытое поле формы
+            let tokenInput = document.querySelector('input[name="smart-token"]');
+            if (!tokenInput) {
+                tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = 'smart-token';
+                form.appendChild(tokenInput);
+            }
+            tokenInput.value = token;
+        };
+    
+        // Обработчик нажатия на MainButton
+        mainButton.onClick(() => {
+            if (isPhotoUploaded && isCaptchaVerified) {
+                form.submit();
+                mainButton.disable();
+            } else {
+                alert('Пожалуйста, загрузите файл и завершите проверку капчи.');
+            }
+        });
+    
+        // Предотвращение сворачивания WebApp при изменении viewport
+        Telegram.WebApp.onEvent('viewportChanged', () => {
+            Telegram.WebApp.expand();
+        });
+    </script>
+</body>
+</html>

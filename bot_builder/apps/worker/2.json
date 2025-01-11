@@ -1,0 +1,48 @@
+{
+    "update_id": 705291391,
+    "callback_query": {
+      "id": "9146683982804423140",
+      "from": {
+        "id": 6424595615,
+        "is_bot": false,
+        "first_name": "Дмитрий Prog",
+        "username": "Dmitriy_prog",
+        "language_code": "ru"
+      },
+      "message": {
+        "message_id": 121,
+        "from": {
+          "id": 7743632835,
+          "is_bot": true,
+          "first_name": "bot_builder_project",
+          "username": "bot_builder_project_bot"
+        },
+        "chat": {
+          "id": 6424595615,
+          "first_name": "Дмитрий Prog",
+          "username": "Dmitriy_prog",
+          "type": "private"
+        },
+        "date": 1727385997,
+        "text": "Добро пожаловать в Бота",
+        "reply_markup": {
+          "inline_keyboard": [
+            [
+              {
+                "text": "repeat",
+                "callback_data": "start"
+              }
+            ],
+            [
+              {
+                "text": "7",
+                "callback_data": "jh"
+              }
+            ]
+          ]
+        }
+      },
+      "chat_instance": "5823506124488979431",
+      "data": "start"
+    }
+  }

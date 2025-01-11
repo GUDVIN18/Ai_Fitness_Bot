@@ -1,0 +1,16 @@
+venv_bot/
+__pycache__/
+*.pyc
+.env
+.sqlite3
+.jpg
+.png
+.log
+.log.1
+.log.2
+.log.
+"bot_builder/media/"
+bot_builder/media/
+.DS_Store
+bot_builder/config.py
+bot_builder/config.py

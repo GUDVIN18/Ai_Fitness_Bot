@@ -1,0 +1,8 @@
+/root/project/venv/lib/python3.10/site-packages/django/db/models/fields/__init__.py:1665: RuntimeWarning: DateTimeField UserTraining.training_data received a naive datetime (2025-01-09 14:30:00) while time zone support is active.
+  warnings.warn(
+/root/project/venv/lib/python3.10/site-packages/django/db/models/fields/__init__.py:1665: RuntimeWarning: DateTimeField UserTraining.training_data received a naive datetime (2025-01-09 14:30:00) while time zone support is active.
+  warnings.warn(
+/root/project/venv/lib/python3.10/site-packages/django/db/models/fields/__init__.py:1665: RuntimeWarning: DateTimeField UserTraining.training_data received a naive datetime (2025-01-11 14:30:00) while time zone support is active.
+  warnings.warn(
+/root/project/venv/lib/python3.10/site-packages/django/db/models/fields/__init__.py:1665: RuntimeWarning: DateTimeField UserTraining.training_data received a naive datetime (2025-01-14 14:30:00) while time zone support is active.
+  warnings.warn(

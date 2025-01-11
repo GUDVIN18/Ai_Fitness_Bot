@@ -1,0 +1,21 @@
+{
+    "update_id": 705291381,
+    "message": {
+      "message_id": 119,
+      "from": {
+        "id": 6424595615,
+        "is_bot": false,
+        "first_name": "Дмитрий Prog",
+        "username": "Dmitriy_prog",
+        "language_code": "ru"
+      },
+      "chat": {
+        "id": 6424595615,
+        "first_name": "Дмитрий Prog",
+        "username": "Dmitriy_prog",
+        "type": "private"
+      },
+      "date": 1727385883,
+      "text": "test_text"
+    }
+  }
